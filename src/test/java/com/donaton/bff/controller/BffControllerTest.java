@@ -30,7 +30,8 @@ public class BffControllerTest {
 
         ResponseEntity<Map<String, Object>> response = bffController.obtenerResumenGeneral();
 
-        assertEquals(200, response.getStatusCodeValue());
+        // CORRECCIÓN AQUÍ
+        assertEquals(200, response.getStatusCode().value());
         assertNotNull(response.getBody());
         assertTrue(response.getBody().containsKey("donaciones"));
         assertTrue(response.getBody().containsKey("logistica"));
