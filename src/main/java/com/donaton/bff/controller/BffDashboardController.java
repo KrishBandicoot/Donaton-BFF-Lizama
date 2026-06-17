@@ -6,7 +6,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -18,6 +17,7 @@ public class BffDashboardController {
     private final String DONACIONES_URL = "http://localhost:8081/api/donacion";
     private final String LOGISTICA_URL = "http://localhost:8082/api/envio";
     private final String USUARIOS_URL = "http://localhost:8083/api/usuarios";
+    private final String CATALOGO_URL = "http://localhost:8082/api/catalogo";
 
     private HttpEntity<Object> empaquetarPeticion(String token, Object body) {
         HttpHeaders headers = new HttpHeaders();
@@ -30,10 +30,26 @@ public class BffDashboardController {
         return new HttpEntity<>(body, headers);
     }
 
+    // ----- RUTAS DE CATÁLOGOS (NUEVO) -----
+    @GetMapping("/catalogos")
+    public ResponseEntity<?> getCatalogos(@RequestHeader(value = "Authorization", required = false) String token) {
+        return restTemplate.exchange(CATALOGO_URL, HttpMethod.GET, empaquetarPeticion(token, null), Object[].class);
+    }
+
+    @PostMapping("/catalogos")
+    public ResponseEntity<?> createCatalogo(@RequestBody Object body, @RequestHeader(value = "Authorization", required = false) String token) {
+        return restTemplate.exchange(CATALOGO_URL, HttpMethod.POST, empaquetarPeticion(token, body), Object.class);
+    }
+
+    @DeleteMapping("/catalogos/{id}")
+    public ResponseEntity<?> deleteCatalogo(@PathVariable Long id, @RequestHeader(value = "Authorization", required = false) String token) {
+        return restTemplate.exchange(CATALOGO_URL + "/" + id, HttpMethod.DELETE, empaquetarPeticion(token, null), Object.class);
+    }
+
+    // ----- RUTAS DE DONACIONES -----
     @GetMapping("/donaciones")
-    public ResponseEntity<List> getDonaciones(@RequestHeader(value = "Authorization", required = false) String token) {
-        // Usamos List.class para que el BFF reciba los datos como una lista genérica y no falle
-        return restTemplate.exchange(DONACIONES_URL, HttpMethod.GET, empaquetarPeticion(token, null), List.class);
+    public ResponseEntity<?> getDonaciones(@RequestHeader(value = "Authorization", required = false) String token) {
+        return restTemplate.exchange(DONACIONES_URL, HttpMethod.GET, empaquetarPeticion(token, null), Object[].class);
     }
 
     @DeleteMapping("/donaciones/{id}")
@@ -46,6 +62,7 @@ public class BffDashboardController {
         return restTemplate.exchange(DONACIONES_URL + "/" + id, HttpMethod.PUT, empaquetarPeticion(token, body), Object.class);
     }
 
+    // ----- RUTAS DE LOGÍSTICA -----
     @GetMapping("/logistica")
     public ResponseEntity<?> getLogistica(@RequestHeader(value = "Authorization", required = false) String token) {
         return restTemplate.exchange(LOGISTICA_URL, HttpMethod.GET, empaquetarPeticion(token, null), Object[].class);
@@ -61,6 +78,7 @@ public class BffDashboardController {
         return restTemplate.exchange(LOGISTICA_URL + "/" + id, HttpMethod.PUT, empaquetarPeticion(token, body), Object.class);
     }
 
+    // ----- RUTAS DE USUARIOS -----
     @GetMapping("/usuarios")
     public ResponseEntity<?> getUsuarios(@RequestHeader(value = "Authorization", required = false) String token) {
         return restTemplate.exchange(USUARIOS_URL, HttpMethod.GET, empaquetarPeticion(token, null), Object[].class);
